@@ -13,7 +13,7 @@ export default function Footer() {
             className="flex items-center flex-initial font-bold md:mr-24"
           >
             <span className="mr-2 border rounded-full border-zinc-700">
-              <Logo />
+              {/* <Logo /> */}
             </span>
             <span>ACME</span>
           </Link>
@@ -85,7 +85,7 @@ export default function Footer() {
               aria-label="Github Repository"
               href="https://github.com/vercel/nextjs-subscription-payments"
             >
-              <GitHub />
+              {/* <GitHub /> */}
             </a>
           </div>
         </div>
@@ -99,11 +99,11 @@ export default function Footer() {
         <div className="flex items-center">
           <span className="text-white">Crafted by</span>
           <a href="https://vercel.com" aria-label="Vercel.com Link">
-            <img
+            {/* <img
               src="/vercel.svg"
               alt="Vercel.com Logo"
               className="inline-block h-6 ml-4 text-white"
-            />
+            /> */}
           </a>
         </div>
       </div>
