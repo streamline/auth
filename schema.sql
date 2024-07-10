@@ -2,7 +2,7 @@
 * USERS
 * Note: This table contains user data. Users should only be able to view and update their own data.
 */
-create table users (
+create table billing.users (
   -- UUID from auth.users
   id uuid references auth.users not null primary key,
   full_name text,
@@ -12,43 +12,43 @@ create table users (
   -- Stores your customer's payment instruments.
   payment_method jsonb
 );
-alter table users enable row level security;
-create policy "Can view own user data." on users for select using (auth.uid() = id);
-create policy "Can update own user data." on users for update using (auth.uid() = id);
+alter table billing.users enable row level security;
+create policy "Can view own user data." on billing.users for select using (auth.uid() = id);
+create policy "Can update own user data." on billing.users for update using (auth.uid() = id);
 
 /**
 * This trigger automatically creates a user entry when a new user signs up via Supabase Auth.
 */ 
-create function public.handle_new_user() 
-returns trigger as $$
-begin
-  insert into public.users (id, full_name, avatar_url)
-  values (new.id, new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'avatar_url');
-  return new;
-end;
-$$ language plpgsql security definer;
-create trigger on_auth_user_created
-  after insert on auth.users
-  for each row execute procedure public.handle_new_user();
+-- create function public.handle_new_user() 
+-- returns trigger as $$
+-- begin
+--   insert into public.users (id, full_name, avatar_url)
+--   values (new.id, new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'avatar_url');
+--   return new;
+-- end;
+-- $$ language plpgsql security definer;
+-- create trigger on_auth_user_created
+--   after insert on auth.users
+--   for each row execute procedure public.handle_new_user();
 
 /**
 * CUSTOMERS
 * Note: this is a private table that contains a mapping of user IDs to Stripe customer IDs.
 */
-create table customers (
+create table billing.customers (
   -- UUID from auth.users
   id uuid references auth.users not null primary key,
   -- The user's customer ID in Stripe. User must not be able to update this.
   stripe_customer_id text
 );
-alter table customers enable row level security;
+alter table billing.customers enable row level security;
 -- No policies as this is a private table that the user must not have access to.
 
 /** 
 * PRODUCTS
 * Note: products are created and managed in Stripe and synced to our DB via Stripe webhooks.
 */
-create table products (
+create table billing.products (
   -- Product ID from Stripe, e.g. prod_1234.
   id text primary key,
   -- Whether the product is currently available for purchase.
@@ -62,20 +62,20 @@ create table products (
   -- Set of key-value pairs, used to store additional information about the object in a structured format.
   metadata jsonb
 );
-alter table products enable row level security;
-create policy "Allow public read-only access." on products for select using (true);
+alter table billing.products enable row level security;
+create policy "Allow public read-only access." on billing.products for select using (true);
 
 /**
 * PRICES
 * Note: prices are created and managed in Stripe and synced to our DB via Stripe webhooks.
 */
-create type pricing_type as enum ('one_time', 'recurring');
-create type pricing_plan_interval as enum ('day', 'week', 'month', 'year');
-create table prices (
+create type billing.pricing_type as enum ('one_time', 'recurring');
+create type billing.pricing_plan_interval as enum ('day', 'week', 'month', 'year');
+create table billing.prices (
   -- Price ID from Stripe, e.g. price_1234.
   id text primary key,
   -- The ID of the prduct that this price belongs to.
-  product_id text references products, 
+  product_id text references billing.products, 
   -- Whether the price can be used for new purchases.
   active boolean,
   -- A brief description of the price.
@@ -85,9 +85,9 @@ create table prices (
   -- Three-letter ISO currency code, in lowercase.
   currency text check (char_length(currency) = 3),
   -- One of `one_time` or `recurring` depending on whether the price is for a one-time purchase or a recurring (subscription) purchase.
-  type pricing_type,
+  type billing.pricing_type,
   -- The frequency at which a subscription is billed. One of `day`, `week`, `month` or `year`.
-  interval pricing_plan_interval,
+  interval billing.pricing_plan_interval,
   -- The number of intervals (specified in the `interval` attribute) between subscription billings. For example, `interval=month` and `interval_count=3` bills every 3 months.
   interval_count integer,
   -- Default number of trial days when subscribing a customer to this price using [`trial_from_plan=true`](https://stripe.com/docs/api#create_subscription-trial_from_plan).
@@ -95,24 +95,24 @@ create table prices (
   -- Set of key-value pairs, used to store additional information about the object in a structured format.
   metadata jsonb
 );
-alter table prices enable row level security;
-create policy "Allow public read-only access." on prices for select using (true);
+alter table billing.prices enable row level security;
+create policy "Allow public read-only access." on billing.prices for select using (true);
 
 /**
 * SUBSCRIPTIONS
 * Note: subscriptions are created and managed in Stripe and synced to our DB via Stripe webhooks.
 */
-create type subscription_status as enum ('trialing', 'active', 'canceled', 'incomplete', 'incomplete_expired', 'past_due', 'unpaid', 'paused');
-create table subscriptions (
+create type billing.subscription_status as enum ('trialing', 'active', 'canceled', 'incomplete', 'incomplete_expired', 'past_due', 'unpaid', 'paused');
+create table billing.subscriptions (
   -- Subscription ID from Stripe, e.g. sub_1234.
   id text primary key,
   user_id uuid references auth.users not null,
   -- The status of the subscription object, one of subscription_status type above.
-  status subscription_status,
+  status billing.subscription_status,
   -- Set of key-value pairs, used to store additional information about the object in a structured format.
   metadata jsonb,
   -- ID of the price that created this subscription.
-  price_id text references prices,
+  price_id text references billing.prices,
   -- Quantity multiplied by the unit amount of the price creates the amount of the subscription. Can be used to charge multiple seats.
   quantity integer,
   -- If true the subscription has been canceled by the user and will be deleted at the end of the billing period.
@@ -134,12 +134,12 @@ create table subscriptions (
   -- If the subscription has a trial, the end of that trial.
   trial_end timestamp with time zone default timezone('utc'::text, now())
 );
-alter table subscriptions enable row level security;
-create policy "Can only view own subs data." on subscriptions for select using (auth.uid() = user_id);
+alter table billing.subscriptions enable row level security;
+create policy "Can only view own subs data." on billing.subscriptions for select using (auth.uid() = user_id);
 
 /**
  * REALTIME SUBSCRIPTIONS
  * Only allow realtime listening on public tables.
  */
 drop publication if exists supabase_realtime;
-create publication supabase_realtime for table products, prices;
+create publication supabase_realtime for table billing.products, billing.prices;
