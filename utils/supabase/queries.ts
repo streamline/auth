@@ -10,6 +10,7 @@ export const getUser = cache(async (supabase: SupabaseClient) => {
 
 export const getSubscription = cache(async (supabase: SupabaseClient) => {
   const { data: subscription, error } = await supabase
+    .schema('billing')
     .from('subscriptions')
     .select('*, prices(*, products(*))')
     .in('status', ['trialing', 'active'])
@@ -20,6 +21,7 @@ export const getSubscription = cache(async (supabase: SupabaseClient) => {
 
 export const getProducts = cache(async (supabase: SupabaseClient) => {
   const { data: products, error } = await supabase
+    .schema('billing')
     .from('products')
     .select('*, prices(*)')
     .eq('active', true)
