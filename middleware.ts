@@ -1,39 +1,35 @@
-import { type NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/utils/supabase/middleware';
+import { basicAuth } from '@/utils/middleware/basic-auth';
 
 export async function middleware(request: NextRequest) {
-  // Handle preflight requests
-  if (request.method === 'OPTIONS') {
-    const response = NextResponse.next();
-    response.headers.set('Access-Control-Allow-Origin', 'https://app.rey.co');
-    response.headers.set(
-      'Access-Control-Allow-Methods',
-      'GET,OPTIONS,PATCH,DELETE,POST,PUT'
-    );
-    response.headers.set(
-      'Access-Control-Allow-Headers',
-      'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-    );
-    return response;
+  const handlers = [basicAuth, updateSession]
+  const response = NextResponse.next()
+
+  for (const handler of handlers) {
+    const handlerResponse = await handler(request, response)
+
+    if (handlerResponse === response) {
+      // Continue to the next handler
+      continue
+    } else if (handlerResponse instanceof NextResponse) {
+      return handlerResponse
+    }
   }
 
-  // Set CORS headers for non-preflight requests
-  const response = await updateSession(request);
-  response.headers.set('Access-Control-Allow-Origin', 'https://app.rey.co');
-  response.headers.set(
-    'Access-Control-Allow-Methods',
-    'GET,OPTIONS,PATCH,DELETE,POST,PUT'
-  );
-  response.headers.set(
-    'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-  );
-
-  return response;
+  return response
 }
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'
+    /*
+     * Match all request paths except:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - images - .svg, .png, .jpg, .jpeg, .gif, .webp
+     * Feel free to modify this pattern to include more paths.
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'
   ]
 };
