@@ -49,7 +49,7 @@ export async function checkoutWithStripe(
 
     let params: Stripe.Checkout.SessionCreateParams = {
       allow_promotion_codes: true,
-      billing_address_collection: 'required',
+      // billing_address_collection: 'required',
       customer,
       customer_update: {
         address: 'auto'
