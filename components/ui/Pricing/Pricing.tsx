@@ -1,7 +1,7 @@
 'use client';
 
 import Button from '@/components/ui/Button';
-import LogoCloud from '@/components/ui/LogoCloud';
+// import LogoCloud from '@/components/ui/LogoCloud';
 import type { Tables } from '@/types_db';
 import { getStripe } from '@/utils/stripe/client';
 import { checkoutWithStripe } from '@/utils/stripe/server';
@@ -80,11 +80,10 @@ export default function Pricing({ user, products, subscription }: Props) {
 
     setPriceIdLoading(undefined);
   };
-
   if (!products.length) {
     return (
       <section className="bg-black">
-        <div className="max-w-6xl px-4 py-8 mx-auto sm:py-24 sm:px-6 lg:px-8">
+        <div className="max-w-6xl px-4 py-4 mx-auto sm:py-12 sm:px-6 lg:px-8">
           <div className="sm:flex sm:flex-col sm:align-center"></div>
           <p className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
             No subscription pricing plans found. Create them in your{' '}
@@ -99,13 +98,13 @@ export default function Pricing({ user, products, subscription }: Props) {
             .
           </p>
         </div>
-        <LogoCloud />
+        {/* <LogoCloud /> */}
       </section>
     );
   } else {
     return (
       <section className="bg-black">
-        <div className="max-w-6xl px-4 py-8 mx-auto sm:py-24 sm:px-6 lg:px-8">
+        <div className="max-w-6xl px-4 py-4 mx-auto sm:py-12 sm:px-6 lg:px-8">
           <div className="sm:flex sm:flex-col sm:align-center">
             <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
               Pricing Plans
@@ -119,11 +118,10 @@ export default function Pricing({ user, products, subscription }: Props) {
                 <button
                   onClick={() => setBillingInterval('month')}
                   type="button"
-                  className={`${
-                    billingInterval === 'month'
-                      ? 'relative w-1/2 bg-zinc-700 border-zinc-800 shadow-sm text-white'
-                      : 'ml-0.5 relative w-1/2 border border-transparent text-zinc-400'
-                  } rounded-md m-1 py-2 text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 focus:z-10 sm:w-auto sm:px-8`}
+                  className={`${billingInterval === 'month'
+                    ? 'relative w-1/2 bg-zinc-700 border-zinc-800 shadow-sm text-white'
+                    : 'ml-0.5 relative w-1/2 border border-transparent text-zinc-400'
+                    } rounded-md m-1 py-2 text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 focus:z-10 sm:w-auto sm:px-8`}
                 >
                   Monthly billing
                 </button>
@@ -132,11 +130,10 @@ export default function Pricing({ user, products, subscription }: Props) {
                 <button
                   onClick={() => setBillingInterval('year')}
                   type="button"
-                  className={`${
-                    billingInterval === 'year'
-                      ? 'relative w-1/2 bg-zinc-700 border-zinc-800 shadow-sm text-white'
-                      : 'ml-0.5 relative w-1/2 border border-transparent text-zinc-400'
-                  } rounded-md m-1 py-2 text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 focus:z-10 sm:w-auto sm:px-8`}
+                  className={`${billingInterval === 'year'
+                    ? 'relative w-1/2 bg-zinc-700 border-zinc-800 shadow-sm text-white'
+                    : 'ml-0.5 relative w-1/2 border border-transparent text-zinc-400'
+                    } rounded-md m-1 py-2 text-sm font-medium whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 focus:z-10 sm:w-auto sm:px-8`}
                 >
                   Yearly billing
                 </button>
@@ -196,7 +193,7 @@ export default function Pricing({ user, products, subscription }: Props) {
               );
             })}
           </div>
-          <LogoCloud />
+          {/* <LogoCloud /> */}
         </div>
       </section>
     );

@@ -55,5 +55,12 @@ p a {
 }
 
 .height-screen-helper {
-  min-height: calc(100vh - 80px);
+  /* min-height: calc(100vh - 80px); */
+  min-height: calc(100dvh - 218px);
+}
+
+@media (width >= 768px) {
+  .height-screen-helper {
+    min-height: calc(100dvh - 170px);
+  }
 }

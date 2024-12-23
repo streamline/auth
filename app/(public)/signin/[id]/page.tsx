@@ -38,7 +38,7 @@ export default async function SignIn({
     const preferredSignInView =
       cookies().get('preferredSignInView')?.value || null;
     viewProp = getDefaultSignInView(preferredSignInView);
-    return redirect(`/signin/${viewProp}`);
+    return redirect(`/${viewProp}`);
   }
 
   // Check if the user is already logged in and redirect to the account page if so
@@ -49,16 +49,16 @@ export default async function SignIn({
   } = await supabase.auth.getUser();
 
   if (user && viewProp !== 'update_password') {
-    return redirect('/');
+    return redirect('/account');
   } else if (!user && viewProp === 'update_password') {
     return redirect('/signin');
   }
 
   return (
     <div className="flex justify-center height-screen-helper">
-      <div className="flex flex-col justify-between max-w-lg p-3 m-auto w-80 ">
+      <div className="flex flex-col justify-between max-w-lg p-3 m-auto w-full">
         <div className="flex justify-center pb-12 ">
-          <Logo width="64px" height="64px" />
+          <Logo width="160px" />
         </div>
         <Card
           title={
