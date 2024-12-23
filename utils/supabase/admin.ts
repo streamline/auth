@@ -15,7 +15,7 @@ const TRIAL_PERIOD_DAYS = 0;
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
   process.env.SUPABASE_SERVICE_ROLE_KEY || '',
-  { db: { schema: 'billing' } }
+  { db: { schema: process.env.SUPABASE_SCHEMA || 'public' } }
 );
 
 const upsertProductRecord = async (product: Stripe.Product) => {
