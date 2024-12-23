@@ -2,16 +2,18 @@ import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
 import { getErrorRedirect, getStatusRedirect } from '@/utils/helpers';
+import { EmailOtpType } from '@supabase/supabase-js';
 
 export async function GET(request: NextRequest) {
   // The `/auth/callback` route is required for the server-side auth flow implemented
   // by the `@supabase/ssr` package. It exchanges an auth code for the user's session.
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
-  const token = requestUrl.searchParams.get('token_hash') || ''; // Magic link token
-  const type = requestUrl.searchParams.get('type'); // Check the flow type
+  const token = requestUrl.searchParams.get('token') || ''; // Token for PKCE
+  const type: EmailOtpType = requestUrl.searchParams.get('type') as EmailOtpType; // Check the flow type
+  const redirectTo = requestUrl.searchParams.get('redirect_to'); // URL to redirect to after sign-in
 
-  if (token && type === 'magiclink') {
+  if (token && type) {
     const supabase = createClient();
 
     // Use `exchangeCodeForSession` to handle the magic link token
@@ -28,15 +30,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-
-    // Successful sign-in
-    return NextResponse.redirect(
-      getStatusRedirect(
-        `${requestUrl.origin}/account`,
-        'Success!',
-        'You are now signed in.'
-      )
-    );
   } else if (code) {
     const supabase = createClient();
 
@@ -56,7 +49,7 @@ export async function GET(request: NextRequest) {
   // URL to redirect to after sign in process completes
   return NextResponse.redirect(
     getStatusRedirect(
-      `${requestUrl.origin}/account`,
+      redirectTo || `${requestUrl.origin}/account`,
       'Success!',
       'You are now signed in.'
     )
