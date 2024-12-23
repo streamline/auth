@@ -7,6 +7,7 @@ import { getStripe } from '@/utils/stripe/client';
 import { checkoutWithStripe } from '@/utils/stripe/server';
 import { getErrorRedirect } from '@/utils/helpers';
 import { User } from '@supabase/supabase-js';
+import { createStripePortal } from '@/utils/stripe/server';
 import cn from 'classnames';
 import { useRouter, usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -80,6 +81,15 @@ export default function Pricing({ user, products, subscription }: Props) {
 
     setPriceIdLoading(undefined);
   };
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const handleStripePortalRequest = async () => {
+    setIsSubmitting(true);
+    const redirectUrl = await createStripePortal(currentPath);
+    setIsSubmitting(false);
+    return router.push(redirectUrl);
+  };
+
   if (!products.length) {
     return (
       <section className="bg-black">
@@ -179,15 +189,24 @@ export default function Pricing({ user, products, subscription }: Props) {
                         /{billingInterval}
                       </span>
                     </p>
-                    <Button
+                    {subscription ? <Button
                       variant="slim"
                       type="button"
-                      loading={priceIdLoading === price.id}
-                      onClick={() => handleStripeCheckout(price)}
+                      loading={priceIdLoading === price.id || isSubmitting}
+                      onClick={handleStripePortalRequest}
                       className="block w-full py-2 mt-8 text-sm font-semibold text-center text-white rounded-md hover:bg-zinc-900"
                     >
-                      {subscription ? 'Manage' : 'Subscribe'}
-                    </Button>
+                      Manage
+                    </Button> :
+                      <Button
+                        variant="slim"
+                        type="button"
+                        loading={priceIdLoading === price.id}
+                        onClick={() => handleStripeCheckout(price)}
+                        className="block w-full py-2 mt-8 text-sm font-semibold text-center text-white rounded-md hover:bg-zinc-900"
+                      >
+                        Subscribe
+                      </Button>}
                   </div>
                 </div>
               );
