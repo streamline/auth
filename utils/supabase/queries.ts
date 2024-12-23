@@ -1,6 +1,8 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { cache } from 'react';
 
+const SCHEMA = process.env.SUPABASE_SCHEMA || 'public';
+
 export const getUser = cache(async (supabase: SupabaseClient) => {
   const {
     data: { user }
@@ -10,7 +12,7 @@ export const getUser = cache(async (supabase: SupabaseClient) => {
 
 export const getSubscription = cache(async (supabase: SupabaseClient) => {
   const { data: subscription, error } = await supabase
-    .schema('billing')
+    .schema(SCHEMA)
     .from('subscriptions')
     .select('*, prices(*, products(*))')
     .in('status', ['trialing', 'active'])
@@ -21,7 +23,7 @@ export const getSubscription = cache(async (supabase: SupabaseClient) => {
 
 export const getProducts = cache(async (supabase: SupabaseClient) => {
   const { data: products, error } = await supabase
-    .schema('billing')
+    .schema(SCHEMA)
     .from('products')
     .select('*, prices(*)')
     .eq('active', true)
