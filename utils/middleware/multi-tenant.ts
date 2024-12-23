@@ -25,14 +25,14 @@ export async function multiTenant(request: NextRequest, response: NextResponse) 
   if (!rawHostname) return response;
 
   const hostname = normalizeHostname(rawHostname);
-  console.log('Hostname:', hostname);
   const searchParams = url.searchParams.toString();
   const path = `${url.pathname}${searchParams.length > 0 ? `?${searchParams}` : ''}`;
 
+  // console.log('Hostname:', hostname);
   // Root domain logic
-//   if (hostname === ROOT_DOMAIN || hostname === 'localhost:3000') {
-//     return NextResponse.rewrite(new URL(`/home${path === '/' ? '' : path}`, request.url));
-//   }
+  // if (hostname === ROOT_DOMAIN || hostname === 'localhost:3000') {
+  //   return NextResponse.rewrite(new URL(`/home${path === '/' ? '' : path}`, request.url));
+  // }
 
   // Rewrite for dynamic domain routing
   return NextResponse.rewrite(new URL(`/${hostname}${path}`, request.url));
