@@ -1,9 +1,10 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/utils/supabase/middleware';
 import { basicAuth } from '@/utils/middleware/basic-auth';
+import { multiTenant } from '@/utils/middleware/multi-tenant';
 
 export async function middleware(request: NextRequest) {
-  const handlers = [basicAuth, updateSession]
+  const handlers = [basicAuth, multiTenant, updateSession]
   const response = NextResponse.next()
 
   for (const handler of handlers) {
@@ -33,3 +34,4 @@ export const config = {
     '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'
   ]
 };
+

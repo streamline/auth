@@ -1,9 +1,13 @@
 import Link from 'next/link';
+import React, { HTMLAttributes } from 'react';
 
-import Logo from '@/components/icons/Logo';
-import GitHub from '@/components/icons/GitHub';
+interface Props extends HTMLAttributes<HTMLDivElement> {
+  domain: string;
+}
 
-export default function Footer() {
+export default function Footer(props: Props) {
+  const domain = decodeURIComponent(props.domain);
+
   return (
     <footer className="mx-auto max-w-[1920px]">
       <div className="max-w-6xl mx-auto">
@@ -15,14 +19,14 @@ export default function Footer() {
           </div>
           <div className="col-span-1 lg:col-span-2 mb-4 md:mb-0">
             <Link
-              href="/"
+              href={`https://${domain}/privacy`}
               className="text-white transition duration-150 ease-in-out hover:underline hover:text-zinc-200"
             >
               Privacy Policy
             </Link>
             {' • '}
             <Link
-              href="/"
+              href={`https://${domain}/terms`}
               className="text-white transition duration-150 ease-in-out hover:underline hover:text-zinc-200"
             >
               Terms of Use
