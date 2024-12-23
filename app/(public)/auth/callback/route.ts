@@ -8,8 +8,36 @@ export async function GET(request: NextRequest) {
   // by the `@supabase/ssr` package. It exchanges an auth code for the user's session.
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
+  const token = requestUrl.searchParams.get('token_hash') || ''; // Magic link token
+  const type = requestUrl.searchParams.get('type'); // Check the flow type
 
-  if (code) {
+  if (token && type === 'magiclink') {
+    const supabase = createClient();
+
+    // Use `exchangeCodeForSession` to handle the magic link token
+    const { error } = await supabase.auth.verifyOtp({ token_hash: token, type })
+    // const { error } = await supabase.auth.exchangeCodeForSession(token);
+    if (error) {
+      console.error('Error exchanging magic link token:', error);
+      return NextResponse.redirect(
+        getErrorRedirect(
+          `${requestUrl.origin}/signin/email_signin`,
+          error.name,
+          "Sorry, we weren't able to log you in. Please try again."
+        )
+      );
+    }
+
+
+    // Successful sign-in
+    return NextResponse.redirect(
+      getStatusRedirect(
+        `${requestUrl.origin}/account`,
+        'Success!',
+        'You are now signed in.'
+      )
+    );
+  } else if (code) {
     const supabase = createClient();
 
     const { error } = await supabase.auth.exchangeCodeForSession(code);
