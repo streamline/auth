@@ -18,7 +18,11 @@ const supabaseAdmin = createClient(
   { db: { schema: process.env.SUPABASE_SCHEMA || 'public' } }
 );
 
-const upsertProductRecord = async (product: Stripe.Product) => {
+interface ProductProps extends Stripe.Product {
+  marketing_features: any[];
+}
+
+const upsertProductRecord = async (product: ProductProps) => {
   const productData: Product = {
     id: product.id,
     active: product.active,
@@ -26,7 +30,7 @@ const upsertProductRecord = async (product: Stripe.Product) => {
     description: product.description ?? null,
     image: product.images?.[0] ?? null,
     metadata: product.metadata,
-    features: product.features as any
+    features: product.marketing_features
   };
 
   const { error: upsertError } = await supabaseAdmin
