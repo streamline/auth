@@ -1,6 +1,7 @@
 import Stripe from 'stripe';
 import { stripe } from '@/utils/stripe/config';
 import {
+  ProductProps,
   upsertProductRecord,
   upsertPriceRecord,
   manageSubscriptionStatusChange,
@@ -42,7 +43,7 @@ export async function POST(req: Request) {
       switch (event.type) {
         case 'product.created':
         case 'product.updated':
-          await upsertProductRecord(event.data.object as Stripe.Product);
+          await upsertProductRecord(event.data.object as ProductProps);
           break;
         case 'price.created':
         case 'price.updated':

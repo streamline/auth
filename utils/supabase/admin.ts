@@ -18,7 +18,7 @@ const supabaseAdmin = createClient(
   { db: { schema: process.env.SUPABASE_SCHEMA || 'public' } }
 );
 
-interface ProductProps extends Stripe.Product {
+export interface ProductProps extends Stripe.Product {
   marketing_features: any[];
 }
 
