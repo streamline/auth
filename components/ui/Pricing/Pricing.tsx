@@ -181,6 +181,11 @@ export default function Pricing({ user, products, subscription }: Props) {
                       {product.name}
                     </h2>
                     <p className="mt-4 text-zinc-300">{product.description}</p>
+                    {product.features?.length
+                      ? <ul className="mt-2 ml-6 text-zinc-300 list-disc">
+                        {product.features.map((feature: any) => <li>{feature?.name}</li>)}
+                      </ul>
+                      : null}
                     <p className="mt-8">
                       <span className="text-5xl font-extrabold white">
                         {priceString}
