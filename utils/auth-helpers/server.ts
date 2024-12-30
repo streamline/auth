@@ -15,15 +15,15 @@ export async function redirectToPath(path: string) {
   return redirect(path);
 }
 
-export async function SignOut(formData: FormData) {
-  const pathName = String(formData.get('pathName')).trim();
+export async function SignOut(pathname: string | null) {
+  const pathName = pathname?.trim();
 
   const supabase = createClient();
   const { error } = await supabase.auth.signOut();
 
   if (error) {
     return getErrorRedirect(
-      pathName,
+      pathName || '/',
       'Hmm... Something went wrong.',
       'You could not be signed out.'
     );
