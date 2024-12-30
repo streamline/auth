@@ -1,18 +1,15 @@
-'use client';
-
 import Link from 'next/link';
 import Logo from '@/components/icons/Logo';
-import { usePathname, useRouter } from 'next/navigation';
-import { getRedirectMethod } from '@/utils/auth-helpers/settings';
+import { createClient } from '@/utils/supabase/server';
 import UserSettingsNav from './UserSettingsNav';
 import s from './Navbar.module.css';
 
-interface NavlinksProps {
-  user?: any;
-}
+export async function Navlinks() {
+  const supabase = createClient();
 
-export default function Navlinks({ user }: NavlinksProps) {
-  const router = getRedirectMethod() === 'client' ? useRouter() : null;
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
 
   return (
     <div className="relative flex flex-row justify-between py-4 align-center md:py-6">
@@ -33,7 +30,7 @@ export default function Navlinks({ user }: NavlinksProps) {
       </div>
       <div className="flex justify-end space-x-8">
         {user ? (
-          <UserSettingsNav user={user} router={router} />
+          <UserSettingsNav user={user} />
         ) : (
           <Link href="/signin" className={s.link}>
             Sign In
@@ -43,3 +40,5 @@ export default function Navlinks({ user }: NavlinksProps) {
     </div>
   );
 }
+
+export default Navlinks;
