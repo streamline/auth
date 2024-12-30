@@ -19,14 +19,14 @@ export default function Footer(props: Props) {
           </div>
           <div className="col-span-1 lg:col-span-2 mb-4 md:mb-0">
             <Link
-              href={`https://${domain}/privacy`}
+              href={`/privacy`}
               className="text-white transition duration-150 ease-in-out hover:underline hover:text-zinc-200"
             >
               Privacy Policy
             </Link>
             {' • '}
             <Link
-              href={`https://${domain}/terms`}
+              href={`/terms`}
               className="text-white transition duration-150 ease-in-out hover:underline hover:text-zinc-200"
             >
               Terms of Use
