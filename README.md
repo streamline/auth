@@ -39,7 +39,7 @@ Follow [this guide](https://supabase.com/docs/guides/auth/social-login/auth-gith
 
 In your Supabase project, navigate to [auth > URL configuration](https://app.supabase.com/project/_/auth/url-configuration) and set your main production URL (e.g. https://your-deployment-url.vercel.app) as the site url.
 
-Next, in your Vercel deployment settings, add a new **Production** environment variable called `NEXT_PUBLIC_SITE_URL` and set it to the same URL. Make sure to deselect preview and development environments to make sure that preview branches and local development work correctly.
+Next, in your Vercel deployment settings, add a new **Production** environment variable called `NEXT_PUBLIC_URL` and set it to the same URL. Make sure to deselect preview and development environments to make sure that preview branches and local development work correctly.
 
 #### [Optional] - Set up redirect wildcards for deploy previews (not needed if you installed via the Deploy Button)
 
