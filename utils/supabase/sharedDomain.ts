@@ -1,6 +1,6 @@
 export const getSharedDomain = () => {
 	const url = process.env.NEXT_PUBLIC_URL;
-
+	console.log('getSharedDomain', url)
 	if (!url) {
 		throw new Error("NEXT_PUBLIC_URL is not defined");
 	}

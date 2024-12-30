@@ -9,6 +9,7 @@ export const createClient = (request: NextRequest) => {
 			headers: request.headers,
 		},
 	});
+	console.log('createClient-sharedDomain', sharedDomain)
 
 	const supabase = createServerClient(
 		process.env.NEXT_PUBLIC_SUPABASE_URL!,
