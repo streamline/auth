@@ -26,7 +26,7 @@ export function UserSettingsNav({ user }: UserSettingsNavProps) {
                 <FaUser />
             </button>
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-800 rounded-md shadow-lg">
+                <div className="absolute right-0 mt-2 w-48 bg-black border border-gray-800 rounded-md shadow-lg">
                     <ul>
                         {user ? (
                             <>
@@ -38,7 +38,7 @@ export function UserSettingsNav({ user }: UserSettingsNavProps) {
                                 <li>
                                     <Link
                                         href={`${process.env.NEXT_PUBLIC_AUTH_URL}/account`}
-                                        className="px-3 py-2 w-full block hover:bg-gray-100 transition-all ease-in-out duration-75"
+                                        className="px-3 py-2 w-full block hover:bg-gray-800 transition-all ease-in-out duration-75"
                                     >
                                         Account Settings
                                     </Link>
@@ -46,7 +46,7 @@ export function UserSettingsNav({ user }: UserSettingsNavProps) {
                                 <li>
                                     <Link
                                         href={`${process.env.NEXT_PUBLIC_AUTH_URL}/signin/logout`}
-                                        className="px-3 py-2 w-full block hover:bg-gray-100 transition-all ease-in-out duration-75"
+                                        className="px-3 py-2 w-full block hover:bg-gray-800 transition-all ease-in-out duration-75"
                                     >
                                         Sign out
                                     </Link>
@@ -60,7 +60,7 @@ export function UserSettingsNav({ user }: UserSettingsNavProps) {
                                 <li>
                                     <Link
                                         href={process.env.NEXT_PUBLIC_AUTH_URL || "/signin"}
-                                        className="px-3 py-2 w-full block hover:bg-gray-100 transition-all ease-in-out duration-75"
+                                        className="px-3 py-2 w-full block hover:bg-gray-800 transition-all ease-in-out duration-75"
                                     >
                                         Sign In
                                     </Link>
