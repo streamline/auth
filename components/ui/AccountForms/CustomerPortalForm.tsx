@@ -14,10 +14,10 @@ type Product = Tables<'products'>;
 
 type SubscriptionWithPriceAndProduct = Subscription & {
   prices:
-    | (Price & {
-        products: Product | null;
-      })
-    | null;
+  | (Price & {
+    products: Product | null;
+  })
+  | null;
 };
 
 interface Props {
@@ -55,23 +55,30 @@ export default function CustomerPortalForm({ subscription }: Props) {
       footer={
         <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center">
           <p className="pb-4 sm:pb-0">Manage your subscription on Stripe.</p>
-          <Button
-            variant="slim"
-            onClick={handleStripePortalRequest}
-            loading={isSubmitting}
-          >
-            Open customer portal
-          </Button>
+          {subscription ? (
+            <Button
+              variant="slim"
+              onClick={handleStripePortalRequest}
+              loading={isSubmitting}
+            >
+              Open customer portal
+            </Button>
+          ) : (
+            <Link href="/plans">
+              <Button
+                variant="slim"
+              >
+                Choose your plan
+              </Button>
+            </Link>)}
         </div>
       }
     >
-      <div className="mt-8 mb-4 text-xl font-semibold">
-        {subscription ? (
-          `${subscriptionPrice}/${subscription?.prices?.interval}`
-        ) : (
-          <Link href="/">Choose your plan</Link>
-        )}
-      </div>
+      {subscription ? (
+        <div className="mt-8 mb-4 text-xl font-semibold">
+          {`${subscriptionPrice}/${subscription?.prices?.interval}`}
+        </div>
+      ) : null}
     </Card>
   );
 }
