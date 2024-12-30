@@ -4,7 +4,7 @@ import Button from '@/components/ui/Button';
 import Link from 'next/link';
 import { signInWithEmail } from '@/utils/auth-helpers/server';
 import { handleRequest } from '@/utils/auth-helpers/client';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
 // Define prop type with allowPassword boolean
@@ -20,11 +20,12 @@ export default function EmailSignIn({
   disableButton
 }: EmailSignInProps) {
   const router = redirectMethod === 'client' ? useRouter() : null;
+  const query = redirectMethod === 'client' ? useSearchParams() : null;
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setIsSubmitting(true); // Disable the button while the request is being handled
-    await handleRequest(e, signInWithEmail, router);
+    await handleRequest(e, signInWithEmail, router, query);
     setIsSubmitting(false);
   };
 

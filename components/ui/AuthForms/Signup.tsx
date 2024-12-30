@@ -5,7 +5,7 @@ import React from 'react';
 import Link from 'next/link';
 import { signUp } from '@/utils/auth-helpers/server';
 import { handleRequest } from '@/utils/auth-helpers/client';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
 // Define prop type with allowEmail boolean
@@ -16,11 +16,12 @@ interface SignUpProps {
 
 export default function SignUp({ allowEmail, redirectMethod }: SignUpProps) {
   const router = redirectMethod === 'client' ? useRouter() : null;
+  const query = redirectMethod === 'client' ? useSearchParams() : null;
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setIsSubmitting(true); // Disable the button while the request is being handled
-    await handleRequest(e, signUp, router);
+    await handleRequest(e, signUp, router, query);
     setIsSubmitting(false);
   };
 

@@ -15,8 +15,8 @@ export async function redirectToPath(path: string) {
   return redirect(path);
 }
 
-export async function SignOut(pathname: string | null) {
-  const pathName = pathname?.trim();
+export async function SignOut(pathname?: string | null) {
+  const pathName = (pathname || '').trim();
 
   const supabase = createClient();
   const { error } = await supabase.auth.signOut();
@@ -34,7 +34,8 @@ export async function SignOut(pathname: string | null) {
 
 export async function signInWithEmail(formData: FormData) {
   const cookieStore = cookies();
-  const callbackURL = getURL('/auth/callback');
+  const redirect = String(formData.get('redirect')).trim();
+  const callbackURL = getURL(`/auth/callback?${redirect ? `redirect=${redirect}` : ''}`);
 
   const email = String(formData.get('email')).trim();
   let redirectPath: string;
@@ -43,7 +44,9 @@ export async function signInWithEmail(formData: FormData) {
     redirectPath = getErrorRedirect(
       '/signin/email_signin',
       'Invalid email address.',
-      'Please try again.'
+      'Please try again.',
+      false,
+      redirect ? `redirect=${redirect}` : ''
     );
   }
 
@@ -65,7 +68,9 @@ export async function signInWithEmail(formData: FormData) {
     redirectPath = getErrorRedirect(
       '/signin/email_signin',
       'You could not be signed in.',
-      error.message
+      error.message,
+      false,
+      redirect ? `redirect=${redirect}` : ''
     );
   } else if (data) {
     cookieStore.set('preferredSignInView', 'email_signin', { path: '/' });
@@ -79,7 +84,9 @@ export async function signInWithEmail(formData: FormData) {
     redirectPath = getErrorRedirect(
       '/signin/email_signin',
       'Hmm... Something went wrong.',
-      'You could not be signed in.'
+      'You could not be signed in.',
+      false,
+      redirect ? `redirect=${redirect}` : ''
     );
   }
 
@@ -133,6 +140,7 @@ export async function requestPasswordUpdate(formData: FormData) {
 
 export async function signInWithPassword(formData: FormData) {
   const cookieStore = cookies();
+  const redirect = String(formData.get('redirect')).trim();
   const email = String(formData.get('email')).trim();
   const password = String(formData.get('password')).trim();
   let redirectPath: string;
@@ -147,16 +155,20 @@ export async function signInWithPassword(formData: FormData) {
     redirectPath = getErrorRedirect(
       '/signin/password_signin',
       'Sign in failed.',
-      error.message
+      error.message,
+      false,
+      redirect ? `redirect=${redirect}` : ''
     );
   } else if (data.user) {
     cookieStore.set('preferredSignInView', 'password_signin', { path: '/' });
-    redirectPath = getStatusRedirect('/', 'Success!', 'You are now signed in.');
+    redirectPath = getStatusRedirect(redirect || '/', 'Success!', 'You are now signed in.');
   } else {
     redirectPath = getErrorRedirect(
       '/signin/password_signin',
       'Hmm... Something went wrong.',
-      'You could not be signed in.'
+      'You could not be signed in.',
+      false,
+      redirect ? `redirect=${redirect}` : ''
     );
   }
 
@@ -164,7 +176,8 @@ export async function signInWithPassword(formData: FormData) {
 }
 
 export async function signUp(formData: FormData) {
-  const callbackURL = getURL('/auth/callback');
+  const redirect = String(formData.get('redirect')).trim();
+  const callbackURL = getURL(`/auth/callback?${redirect ? `redirect=${redirect}` : ''}`);
 
   const email = String(formData.get('email')).trim();
   const password = String(formData.get('password')).trim();
@@ -174,7 +187,9 @@ export async function signUp(formData: FormData) {
     redirectPath = getErrorRedirect(
       '/signin/signup',
       'Invalid email address.',
-      'Please try again.'
+      'Please try again.',
+      false,
+      redirect ? `redirect=${redirect}` : ''
     );
   }
 
@@ -191,10 +206,12 @@ export async function signUp(formData: FormData) {
     redirectPath = getErrorRedirect(
       '/signin/signup',
       'Sign up failed.',
-      error.message
+      error.message,
+      false,
+      redirect ? `redirect=${redirect}` : ''
     );
   } else if (data.session) {
-    redirectPath = getStatusRedirect('/', 'Success!', 'You are now signed in.');
+    redirectPath = getStatusRedirect(redirect || '/', 'Success!', 'You are now signed in.');
   } else if (
     data.user &&
     data.user.identities &&
@@ -203,11 +220,13 @@ export async function signUp(formData: FormData) {
     redirectPath = getErrorRedirect(
       '/signin/signup',
       'Sign up failed.',
-      'There is already an account associated with this email address. Try resetting your password.'
+      'There is already an account associated with this email address. Try resetting your password.',
+      false,
+      redirect ? `redirect=${redirect}` : ''
     );
   } else if (data.user) {
     redirectPath = getStatusRedirect(
-      '/',
+      redirect || '/',
       'Success!',
       'Please check your email for a confirmation link. You may now close this tab.'
     );
@@ -215,7 +234,9 @@ export async function signUp(formData: FormData) {
     redirectPath = getErrorRedirect(
       '/signin/signup',
       'Hmm... Something went wrong.',
-      'You could not be signed up.'
+      'You could not be signed up.',
+      false,
+      redirect ? `redirect=${redirect}` : ''
     );
   }
 

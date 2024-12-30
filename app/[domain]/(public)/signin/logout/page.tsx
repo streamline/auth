@@ -3,9 +3,6 @@ import { redirect } from 'next/navigation';
 import { headers } from "next/headers";
 
 export default async function Logout() {
-    const heads = headers()
-    const pathname = heads.get('next-url')
-
-    await SignOut(pathname);
+    await SignOut();
     return redirect('/signin');
 }

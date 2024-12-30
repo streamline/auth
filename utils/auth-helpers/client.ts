@@ -9,12 +9,15 @@ import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.share
 export async function handleRequest(
   e: React.FormEvent<HTMLFormElement>,
   requestFunc: (formData: FormData) => Promise<string>,
-  router: AppRouterInstance | null = null
+  router: AppRouterInstance | null = null,
+  query: URLSearchParams | null = null
 ): Promise<boolean | void> {
   // Prevent default form submission refresh
   e.preventDefault();
 
+  const redirectParam = query?.get('redirect')
   const formData = new FormData(e.currentTarget);
+  formData.append('redirect', redirectParam || '/');
   const redirectUrl: string = await requestFunc(formData);
 
   if (router) {
