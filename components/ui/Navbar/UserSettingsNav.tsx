@@ -6,7 +6,7 @@ import { useState } from "react";
 import { FaUser } from "react-icons/fa";
 
 interface UserSettingsNavProps {
-    user: User;
+    user: User | null;
 }
 
 export function UserSettingsNav({ user }: UserSettingsNavProps) {
