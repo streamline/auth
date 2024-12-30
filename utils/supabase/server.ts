@@ -10,8 +10,6 @@ const cookieOptions = {
   sameSite: "None", // Required for cross-domain usage
 };
 
-console.log('supabase server.ts: sharedDomain:', sharedDomain);
-
 // Define a function to create a Supabase client for server-side operations
 // The function takes a cookie store created with next/headers cookies as an argument
 export const createClient = () => {

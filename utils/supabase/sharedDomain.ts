@@ -3,12 +3,10 @@ export const getSharedDomain = () => {
 	if (!url) {
 		throw new Error("NEXT_PUBLIC_URL is not defined");
 	}
-	console.log('NEXT_PUBLIC_URL', url)
 
 	try {
 		const parsedUrl = new URL(url);
 		const hostname = parsedUrl.hostname;
-		console.log('hostname', hostname)
 
 		// For localhost, return null or a default value
 		if (hostname === "localhost") {
@@ -17,7 +15,6 @@ export const getSharedDomain = () => {
 
 		// For production domains, return the shared domain
 		const domainParts = hostname.split(".");
-		console.log('Domain Parts:', domainParts);
 
 		if (domainParts.length > 2) {
 			// Handle subdomains like "auth.rey.co"
@@ -33,4 +30,3 @@ export const getSharedDomain = () => {
 
 // Usage
 export const sharedDomain = getSharedDomain();
-console.log('sharedDomain22', sharedDomain);

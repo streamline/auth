@@ -1,7 +1,6 @@
 import { type CookieOptions, createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 import { sharedDomain } from "./sharedDomain";
-console.log('supabase/middleware.ts: sharedDomain:', sharedDomain);
 
 // Ensure options include the domain and security settings
 const cookieOptions = {
@@ -17,7 +16,6 @@ export const createClient = (request: NextRequest) => {
 			headers: request.headers,
 		},
 	});
-	console.log('createClient-sharedDomain', sharedDomain)
 
 	const supabase = createServerClient(
 		process.env.NEXT_PUBLIC_SUPABASE_URL!,
