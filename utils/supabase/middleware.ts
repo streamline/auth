@@ -1,63 +1,86 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
-import { type NextRequest, NextResponse } from 'next/server';
+import { type CookieOptions, createServerClient } from "@supabase/ssr";
+import { type NextRequest, NextResponse } from "next/server";
+import { sharedDomain } from "./sharedDomain";
 
 export const createClient = (request: NextRequest) => {
-  // Create an unmodified response
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers
-    }
-  });
+	// Create an unmodified response
+	let response = NextResponse.next({
+		request: {
+			headers: request.headers,
+		},
+	});
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value;
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          // If the cookie is updated, update the cookies for the request and response
-          request.cookies.set({
-            name,
-            value,
-            ...options
-          });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers
-            }
-          });
-          response.cookies.set({
-            name,
-            value,
-            ...options
-          });
-        },
-        remove(name: string, options: CookieOptions) {
-          // If the cookie is removed, update the cookies for the request and response
-          request.cookies.set({
-            name,
-            value: '',
-            ...options
-          });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers
-            }
-          });
-          response.cookies.set({
-            name,
-            value: '',
-            ...options
-          });
-        }
-      }
-    }
-  );
+	const supabase = createServerClient(
+		process.env.NEXT_PUBLIC_SUPABASE_URL!,
+		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+		{
+			cookies: {
+				get(name: string) {
+					return request.cookies.get(name)?.value;
+				},
 
-  return { supabase, response };
+				set(name: string, value: string, options: CookieOptions) {
+					// Ensure options include the domain and security settings
+					const cookieOptions = {
+						...options,
+						domain: sharedDomain,
+						secure: true, // Ensures cookies are sent over HTTPS
+						sameSite: "None", // Required for cross-domain usage
+					};
+
+					// Update request cookies
+					request.cookies.set({
+						name,
+						value,
+						...cookieOptions,
+					});
+
+					// Update response cookies
+					response = NextResponse.next({
+						request: {
+							headers: request.headers,
+						},
+					});
+					response.cookies.set({
+						name,
+						value,
+						...cookieOptions,
+					});
+				},
+
+				remove(name: string, options: CookieOptions) {
+					// Ensure options include the domain and security settings
+					const cookieOptions = {
+						...options,
+						domain: sharedDomain,
+						secure: true,
+						sameSite: "None",
+					};
+
+					// Remove from request cookies
+					request.cookies.set({
+						name,
+						value: "",
+						...cookieOptions,
+					});
+
+					// Remove from response cookies
+					response = NextResponse.next({
+						request: {
+							headers: request.headers,
+						},
+					});
+					response.cookies.set({
+						name,
+						value: "",
+						...cookieOptions,
+					});
+				},
+			},
+		},
+	);
+
+	return { supabase, response };
 };
 
 export const updateSession = async (request: NextRequest) => {
