@@ -22,7 +22,7 @@ export default async function SignIn({
   searchParams
 }: {
   params: { id: string };
-  searchParams: { disable_button: boolean };
+  searchParams: { disable_button: boolean; redirect?: string };
 }) {
   const { allowOauth, allowEmail, allowPassword } = getAuthTypes();
   const viewTypes = getViewTypes();
@@ -38,7 +38,7 @@ export default async function SignIn({
     const preferredSignInView =
       cookies().get('preferredSignInView')?.value || null;
     viewProp = getDefaultSignInView(preferredSignInView);
-    return redirect(`/${viewProp}`);
+    return redirect(searchParams.redirect || `/${viewProp}`);
   }
 
   // Check if the user is already logged in and redirect to the account page if so
@@ -49,9 +49,9 @@ export default async function SignIn({
   } = await supabase.auth.getUser();
 
   if (user && viewProp !== 'update_password') {
-    return redirect('/account');
+    return redirect(searchParams.redirect || `/account`);
   } else if (!user && viewProp === 'update_password') {
-    return redirect('/signin');
+    return redirect(`/signin?redirect=${searchParams.redirect}`);
   }
 
   return (
