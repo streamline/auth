@@ -2,6 +2,13 @@ import { type CookieOptions, createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 import { sharedDomain } from "./sharedDomain";
 
+// Ensure options include the domain and security settings
+const cookieOptions = {
+	domain: sharedDomain,
+	secure: true, // Ensures cookies are sent over HTTPS
+	sameSite: "None", // Required for cross-domain usage
+};
+
 export const createClient = (request: NextRequest) => {
 	// Create an unmodified response
 	let response = NextResponse.next({
@@ -21,18 +28,12 @@ export const createClient = (request: NextRequest) => {
 				},
 
 				set(name: string, value: string, options: CookieOptions) {
-					// Ensure options include the domain and security settings
-					const cookieOptions = {
-						...options,
-						domain: sharedDomain,
-						secure: true, // Ensures cookies are sent over HTTPS
-						sameSite: "None", // Required for cross-domain usage
-					};
 
 					// Update request cookies
 					request.cookies.set({
 						name,
 						value,
+						...options,
 						...cookieOptions,
 					});
 
@@ -45,23 +46,17 @@ export const createClient = (request: NextRequest) => {
 					response.cookies.set({
 						name,
 						value,
+						...options,
 						...cookieOptions,
 					});
 				},
 
 				remove(name: string, options: CookieOptions) {
-					// Ensure options include the domain and security settings
-					const cookieOptions = {
-						...options,
-						domain: sharedDomain,
-						secure: true,
-						sameSite: "None",
-					};
-
 					// Remove from request cookies
 					request.cookies.set({
 						name,
 						value: "",
+						...options,
 						...cookieOptions,
 					});
 
@@ -74,6 +69,7 @@ export const createClient = (request: NextRequest) => {
 					response.cookies.set({
 						name,
 						value: "",
+						...options,
 						...cookieOptions,
 					});
 				},

@@ -33,3 +33,4 @@ export const getSharedDomain = () => {
 
 // Usage
 export const sharedDomain = getSharedDomain();
+console.log('sharedDomain22', sharedDomain);

@@ -1,6 +1,14 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { Database } from '@/types_db';
+import { sharedDomain } from "./sharedDomain";
+
+// Ensure options include the domain and security settings
+const cookieOptions = {
+  domain: sharedDomain,
+  secure: true, // Ensures cookies are sent over HTTPS
+  sameSite: "None", // Required for cross-domain usage
+};
 
 // Define a function to create a Supabase client for server-side operations
 // The function takes a cookie store created with next/headers cookies as an argument
@@ -21,8 +29,9 @@ export const createClient = () => {
         },
         // The set method is used to set a cookie with a given name, value, and options
         set(name: string, value: string, options: CookieOptions) {
+
           try {
-            cookieStore.set({ name, value, ...options });
+            cookieStore.set({ name, value, ...options, ...cookieOptions });
           } catch (error) {
             // If the set method is called from a Server Component, an error may occur
             // This can be ignored if there is middleware refreshing user sessions
@@ -31,7 +40,7 @@ export const createClient = () => {
         // The remove method is used to delete a cookie by its name
         remove(name: string, options: CookieOptions) {
           try {
-            cookieStore.set({ name, value: '', ...options });
+            cookieStore.set({ name, value: '', ...options, ...cookieOptions });
           } catch (error) {
             // If the remove method is called from a Server Component, an error may occur
             // This can be ignored if there is middleware refreshing user sessions
