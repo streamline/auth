@@ -8,7 +8,7 @@ export const getSharedDomain = () => {
 	try {
 		const parsedUrl = new URL(url);
 		const hostname = parsedUrl.hostname;
-		console.log('hostname', url)
+		console.log('hostname', hostname)
 
 		// For localhost, return null or a default value
 		if (hostname === "localhost") {
