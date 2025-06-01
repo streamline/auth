@@ -25,7 +25,7 @@ export default async function SignIn({
   params: { id: string };
   searchParams: { disable_button: boolean; redirect?: string };
 }) {
-  if (process.env.NEXT_PUBLIC_DISABLE_SIGNUP === 'true') {
+  if (process.env.NEXT_PUBLIC_DISABLE_SIGNUP === 'true' && params.id === 'signup') {
     notFound()
   }
 
