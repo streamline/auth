@@ -2,6 +2,7 @@ import Logo from '@/components/icons/Logo';
 import { createClient } from '@/utils/supabase/server';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { notFound } from 'next/navigation'
 import {
   getAuthTypes,
   getViewTypes,
@@ -24,6 +25,10 @@ export default async function SignIn({
   params: { id: string };
   searchParams: { disable_button: boolean; redirect?: string };
 }) {
+  if (process.env.NEXT_PUBLIC_DISABLE_SIGNUP === 'true') {
+    notFound()
+  }
+
   const { allowOauth, allowEmail, allowPassword } = getAuthTypes();
   const viewTypes = getViewTypes();
   const redirectMethod = getRedirectMethod();
