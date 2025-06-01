@@ -15,6 +15,59 @@ export async function redirectToPath(path: string) {
   return redirect(path);
 }
 
+export async function verifyOtp(formData: FormData) {
+  const cookieStore = cookies();
+  const email = (cookieStore.get('otp_email')?.value || '').trim();
+  const phone = (cookieStore.get('otp_phone')?.value || '').trim();
+  const otp = String(formData.get('otp')).trim();
+  const redirect = String(formData.get('redirect')).trim();
+
+  const supabase = createClient();
+
+  if (!otp) {
+    return getErrorRedirect(
+      '/signin/email_otp',
+      'Verification failed',
+      'Please enter the OTP code.',
+      false,
+      redirect ? `redirect=${redirect}` : ''
+    );
+  }
+
+  const { data, error } = (email) 
+    ? await supabase.auth.verifyOtp({
+      type: 'email',
+      email,
+      token: otp
+    }) 
+    : phone 
+      ? await supabase.auth.verifyOtp({
+        phone: phone,
+        token: otp,
+        type: 'sms' // or 'phone' depending on version
+      }) 
+      : { data: null, error: new Error(`Something wen't wrong. Please request a new OTP code`) };
+
+  if (error) {
+    return getErrorRedirect(
+      '/signin/email_otp',
+      'Verification failed',
+      error.message,
+      false,
+      redirect ? `redirect=${redirect}` : ''
+    );
+  }
+
+  cookieStore.delete('otp_email');
+  cookieStore.delete('otp_phone');
+
+  return getStatusRedirect(
+    redirect || '/',
+    'Success!',
+    'You are now signed in.'
+  );
+}
+
 export async function SignOut(pathname?: string | null) {
   const pathName = (pathname || '').trim();
 
@@ -35,9 +88,10 @@ export async function SignOut(pathname?: string | null) {
 export async function signInWithEmail(formData: FormData) {
   const cookieStore = cookies();
   const redirect = String(formData.get('redirect')).trim();
-  const callbackURL = getURL(`/auth/callback?${redirect ? `redirect=${redirect}` : ''}`);
+  // const callbackURL = getURL(`/auth/callback?${redirect ? `redirect=${redirect}` : ''}`);
 
   const email = String(formData.get('email')).trim();
+  const phone = String(formData.get('phone')).trim();
   let redirectPath: string;
 
   if (!isValidEmail(email)) {
@@ -52,7 +106,7 @@ export async function signInWithEmail(formData: FormData) {
 
   const supabase = createClient();
   let options = {
-    emailRedirectTo: callbackURL,
+    // emailRedirectTo: callbackURL,
     shouldCreateUser: true
   };
 
@@ -63,6 +117,9 @@ export async function signInWithEmail(formData: FormData) {
     email,
     options: options
   });
+
+  cookieStore.set('otp_email', email, { path: '/' });
+  cookieStore.set('otp_phone', phone, { path: '/' });
 
   if (error) {
     redirectPath = getErrorRedirect(
@@ -75,10 +132,11 @@ export async function signInWithEmail(formData: FormData) {
   } else if (data) {
     cookieStore.set('preferredSignInView', 'email_signin', { path: '/' });
     redirectPath = getStatusRedirect(
-      '/signin/email_signin',
+    '/signin/email_otp',
       'Success!',
-      'Please check your email for a magic link. You may now close this tab.',
-      true
+      'Please check your email for the OTP number.',
+      false,
+      redirect ? `redirect=${redirect}` : ''
     );
   } else {
     redirectPath = getErrorRedirect(

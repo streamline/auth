@@ -9,9 +9,9 @@ export async function GET(request: NextRequest) {
   // by the `@supabase/ssr` package. It exchanges an auth code for the user's session.
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
-  const token = requestUrl.searchParams.get('token') || ''; // Token for PKCE
+  const token = requestUrl.searchParams.get('token') || requestUrl.searchParams.get('token_hash') || ''; // Token for PKCE
   const type: EmailOtpType = requestUrl.searchParams.get('type') as EmailOtpType; // Check the flow type
-  const redirectTo = requestUrl.searchParams.get('redirect_to'); // URL to redirect to after sign-in
+  const redirectTo =requestUrl.searchParams.get('redirect') || requestUrl.searchParams.get('redirect_to'); // URL to redirect to after sign-in
 
   if (token && type) {
     const supabase = createClient();

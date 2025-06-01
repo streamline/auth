@@ -17,6 +17,7 @@ import OauthSignIn from '@/components/ui/AuthForms/OauthSignIn';
 import ForgotPassword from '@/components/ui/AuthForms/ForgotPassword';
 import UpdatePassword from '@/components/ui/AuthForms/UpdatePassword';
 import SignUp from '@/components/ui/AuthForms/Signup';
+import OtpSignIn from '@/components/ui/AuthForms/OtpSignIn';
 
 export default async function SignIn({
   params,
@@ -82,9 +83,12 @@ export default async function SignIn({
               redirectMethod={redirectMethod}
             />
           )}
+          {viewProp === 'email_otp' && (
+            <OtpSignIn redirectMethod={redirectMethod} />
+          )}
           {viewProp === 'email_signin' && (
             <EmailSignIn
-              allowPassword={allowPassword}
+              allowPassword={allowPassword} x
               redirectMethod={redirectMethod}
               disableButton={searchParams.disable_button}
             />
@@ -104,6 +108,7 @@ export default async function SignIn({
           )}
           {viewProp !== 'update_password' &&
             viewProp !== 'signup' &&
+            viewProp !== 'email_otp' &&
             allowOauth && (
               <>
                 <Separator text="Third-party sign-in" />

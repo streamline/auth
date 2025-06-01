@@ -19,7 +19,7 @@ export const getViewTypes = () => {
   // Define the valid view types
   let viewTypes: string[] = [];
   if (allowEmail) {
-    viewTypes = [...viewTypes, 'email_signin'];
+    viewTypes = [...viewTypes, 'email_otp', 'email_signin'];
   }
   if (allowPassword) {
     viewTypes = [
