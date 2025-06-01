@@ -17,6 +17,8 @@ export default function PasswordSignIn({
   allowEmail,
   redirectMethod
 }: PasswordSignInProps) {
+  const searchParams = useSearchParams();
+  const redirect = encodeURIComponent(searchParams.get('redirect') || '/');
   const router = redirectMethod === 'client' ? useRouter() : null;
   const query = redirectMethod === 'client' ? useSearchParams() : null;
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -68,20 +70,20 @@ export default function PasswordSignIn({
         </div>
       </form>
       <p>
-        <Link href="/signin/forgot_password" className="font-light text-sm">
+        <Link href={`/signin/forgot_password?redirect=${redirect}`} className="font-light text-sm">
           Forgot your password?
         </Link>
       </p>
       {allowEmail && (
         <p>
-          <Link href="/signin/email_signin" className="font-light text-sm">
+          <Link href={`/signin/email_signin?redirect=${redirect}`} className="font-light text-sm">
             Sign in via magic link
           </Link>
         </p>
       )}
       {process.env.NEXT_PUBLIC_DISABLE_SIGNUP !== 'true' ? (
         <p>
-          <Link href="/signin/signup" className="font-light text-sm">
+          <Link href={`/signin/signup?redirect=${redirect}`} className="font-light text-sm">
             Don't have an account? Sign up
           </Link>
         </p>) : null}

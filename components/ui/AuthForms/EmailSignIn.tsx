@@ -19,6 +19,8 @@ export default function EmailSignIn({
   redirectMethod,
   disableButton
 }: EmailSignInProps) {
+  const searchParams = useSearchParams();
+  const redirect = encodeURIComponent(searchParams.get('redirect') || '/');
   const router = redirectMethod === 'client' ? useRouter() : null;
   const query = redirectMethod === 'client' ? useSearchParams() : null;
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -64,12 +66,12 @@ export default function EmailSignIn({
       {allowPassword && (
         <>
           <p>
-            <Link href="/signin/password_signin" className="font-light text-sm">
+            <Link href={`/signin/password_signin?redirect=${redirect}`} className="font-light text-sm">
               Sign in with email and password
             </Link>
           </p>
           <p>
-            <Link href="/signin/signup" className="font-light text-sm">
+            <Link href={`/signin/signup?redirect=${redirect}`} className="font-light text-sm">
               Don't have an account? Sign up
             </Link>
           </p>

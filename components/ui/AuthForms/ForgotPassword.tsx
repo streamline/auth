@@ -4,7 +4,7 @@ import Button from '@/components/ui/Button';
 import Link from 'next/link';
 import { requestPasswordUpdate } from '@/utils/auth-helpers/server';
 import { handleRequest } from '@/utils/auth-helpers/client';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
 // Define prop type with allowEmail boolean
@@ -19,6 +19,8 @@ export default function ForgotPassword({
   redirectMethod,
   disableButton
 }: ForgotPasswordProps) {
+  const searchParams = useSearchParams();
+  const redirect = encodeURIComponent(searchParams.get('redirect') || '/');
   const router = redirectMethod === 'client' ? useRouter() : null;
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -61,19 +63,19 @@ export default function ForgotPassword({
         </div>
       </form>
       <p>
-        <Link href="/signin/password_signin" className="font-light text-sm">
+        <Link href={`/signin/password_signin?redirect=${redirect}`} className="font-light text-sm">
           Sign in with email and password
         </Link>
       </p>
       {allowEmail && (
         <p>
-          <Link href="/signin/email_signin" className="font-light text-sm">
+          <Link href={`/signin/email_signin?redirect=${redirect}`} className="font-light text-sm">
             Sign in via magic link
           </Link>
         </p>
       )}
       <p>
-        <Link href="/signin/signup" className="font-light text-sm">
+        <Link href={`/signin/signup?redirect=${redirect}`} className="font-light text-sm">
           Don't have an account? Sign up
         </Link>
       </p>
