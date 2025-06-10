@@ -239,7 +239,7 @@ export async function signInWithPassword(formData: FormData) {
     }
 
     // Step 5: Dev-only token forwarding via URL
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.ALLOW_SUPA_ACROSS_DOMAINS === 'true') {
       const targetUrl = new URL(redirect || '/', process.env.NEXT_PUBLIC_SITE_URL);
       if (access_token) targetUrl.searchParams.set('access_token', access_token);
       if (refresh_token) targetUrl.searchParams.set('refresh_token', refresh_token);
