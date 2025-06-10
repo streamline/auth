@@ -2,11 +2,11 @@ import Link from 'next/link';
 import React, { HTMLAttributes } from 'react';
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  domain: string;
+  // domain: string;
 }
 
 export default function Footer(props: Props) {
-  const domain = decodeURIComponent(props.domain);
+  // const domain = decodeURIComponent(props.domain);
 
   return (
     <footer className="mx-auto max-w-[1920px]">
