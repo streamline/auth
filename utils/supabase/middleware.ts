@@ -80,24 +80,49 @@ export const createClient = (request: NextRequest) => {
 };
 
 export const updateSession = async (request: NextRequest) => {
-  try {
-    // This `try/catch` block is only here for the interactive tutorial.
-    // Feel free to remove once you have Supabase connected.
-    const { supabase, response } = createClient(request);
+	const url = request.nextUrl;
+	const path = url.pathname;
 
-    // This will refresh session if expired - required for Server Components
-    // https://supabase.com/docs/guides/auth/server-side/nextjs
-    await supabase.auth.getUser();
+	try {
+		// This `try/catch` block is only here for the interactive tutorial.
+		// Feel free to remove once you have Supabase connected.
+		const { supabase, response } = createClient(request);
 
-    return response;
-  } catch (e) {
-    // If you are here, a Supabase client could not be created!
-    // This is likely because you have not set up environment variables.
-    // Check out http://localhost:3000 for Next Steps.
-    return NextResponse.next({
-      request: {
-        headers: request.headers
-      }
-    });
-  }
+		// This will refresh session if expired - required for Server Components
+		// https://supabase.com/docs/guides/auth/server-side/nextjs
+		await supabase.auth.getUser();
+		
+		if (path === '/done') {
+			const redirectTo = url.searchParams.get('redirect');
+			if (!redirectTo) return NextResponse.next();
+
+			const { data: { session } } = await supabase.auth.getSession();
+
+			if (session && redirectTo && redirectTo.startsWith('http')) {
+				if (process.env.ALLOW_SUPA_ACROSS_DOMAINS === 'true') {
+					const target = new URL('/auth/callback', redirectTo);
+					target.searchParams.set('access_token', session.access_token);
+					target.searchParams.set('refresh_token', session.refresh_token);
+					return NextResponse.redirect(target);
+				} else {
+					return NextResponse.redirect(redirectTo || '/account');
+				}
+			} else {
+				console.warn('Invalid redirectTo:', redirectTo);
+				return NextResponse.redirect(new URL('/', request.url)); // fallback
+			}
+		}
+
+		return response;
+	} catch (e) {
+		console.error('Error creating Supabase client:', e);
+		// If you are here, a Supabase client could not be created!
+		// This is likely because you have not set up environment variables.
+		// Check out http://localhost:3000 for Next Steps.
+		return NextResponse.next({
+		request: {
+			headers: request.headers
+		}
+		});
+	}
 };

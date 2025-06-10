@@ -1,10 +1,10 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/utils/supabase/middleware';
 import { basicAuth } from '@/utils/middleware/basic-auth';
-import { multiTenant } from '@/utils/middleware/multi-tenant';
+// import { multiTenant } from '@/utils/middleware/multi-tenant';
 
 export async function middleware(request: NextRequest) {
-  const handlers = [basicAuth, multiTenant, updateSession]
+  const handlers = [basicAuth, updateSession]
   const response = NextResponse.next()
 
   for (const handler of handlers) {
@@ -23,6 +23,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    '/done', 
     /*
      * Match all request paths except:
      * - _next/static (static files)

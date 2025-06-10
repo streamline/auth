@@ -62,7 +62,7 @@ export async function verifyOtp(formData: FormData) {
   cookieStore.delete('otp_phone');
 
   return getStatusRedirect(
-    redirect || '/',
+    `/done?redirect=${redirect}`,
     'Success!',
     'You are now signed in.'
   );
@@ -204,60 +204,33 @@ export async function signInWithPassword(formData: FormData) {
   let redirectPath: string;
 
   const supabase = createClient();
-
-  // Step 1: Sign in with password
   const { error, data } = await supabase.auth.signInWithPassword({
     email,
-    password,
+    password
   });
 
-  // Step 2: Handle error
   if (error) {
-    return getErrorRedirect(
+    redirectPath = getErrorRedirect(
       '/signin/password_signin',
       'Sign in failed.',
       error.message,
       false,
-      redirect ? `redirect=${encodeURIComponent(redirect)}` : ''
+      redirect ? `redirect=${redirect}` : ''
+    );
+  } else if (data.user) {
+    cookieStore.set('preferredSignInView', 'password_signin', { path: '/' });
+    redirectPath = getStatusRedirect(`/done?redirect=${redirect}`, 'Success!', 'You are now signed in.');
+  } else {
+    redirectPath = getErrorRedirect(
+      '/signin/password_signin',
+      'Hmm... Something went wrong.',
+      'You could not be signed in.',
+      false,
+      redirect ? `redirect=${redirect}` : ''
     );
   }
 
-  // Step 3: Handle successful login
-  if (data.session && data.user) {
-    cookieStore.set('preferredSignInView', 'password_signin', { path: '/' });
-
-    let access_token = data.session.access_token;
-    let refresh_token = data.session.refresh_token;
-
-    // Step 4: If refresh_token missing, explicitly fetch session
-    if (!refresh_token) {
-      const sessionRes = await supabase.auth.getSession();
-      if (sessionRes.data.session) {
-        access_token = sessionRes.data.session.access_token;
-        refresh_token = sessionRes.data.session.refresh_token;
-      }
-    }
-
-    // Step 5: Dev-only token forwarding via URL
-    if (process.env.ALLOW_SUPA_ACROSS_DOMAINS === 'true') {
-      const targetUrl = new URL(redirect || '/', process.env.NEXT_PUBLIC_SITE_URL);
-      if (access_token) targetUrl.searchParams.set('access_token', access_token);
-      if (refresh_token) targetUrl.searchParams.set('refresh_token', refresh_token);
-      return targetUrl.toString();
-    }
-
-    // Step 6: Production — just redirect to the app (cookie-based)
-    return getStatusRedirect(redirect || '/', 'Success!', 'You are now signed in.');
-  }
-
-  // Step 7: Fallback in case no user returned (rare)
-  return getErrorRedirect(
-    '/signin/password_signin',
-    'Hmm... Something went wrong.',
-    'You could not be signed in.',
-    false,
-    redirect ? `redirect=${encodeURIComponent(redirect)}` : ''
-  );
+  return redirectPath;
 }
 
 export async function signUp(formData: FormData) {
@@ -296,7 +269,7 @@ export async function signUp(formData: FormData) {
       redirect ? `redirect=${redirect}` : ''
     );
   } else if (data.session) {
-    redirectPath = getStatusRedirect(redirect || '/', 'Success!', 'You are now signed in.');
+    redirectPath = getStatusRedirect(`/done?redirect=${redirect}`, 'Success!', 'You are now signed in.');
   } else if (
     data.user &&
     data.user.identities &&
@@ -311,7 +284,7 @@ export async function signUp(formData: FormData) {
     );
   } else if (data.user) {
     redirectPath = getStatusRedirect(
-      redirect || '/',
+      `/done?redirect=${redirect}`,
       'Success!',
       'Please check your email for a confirmation link. You may now close this tab.'
     );
